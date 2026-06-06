@@ -77,7 +77,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.8 }}
-            className="text-4xl sm:text-5xl md:text-7xl font-black text-white mb-6 tracking-tighter leading-tight"
+            className="text-3xl sm:text-5xl md:text-7xl font-black text-white mb-6 tracking-tighter leading-tight break-words"
           >
             ELEVA TU ESTILO <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-brand-gold)] to-[var(--color-brand-purple)]">
@@ -147,7 +147,7 @@ export default function Home() {
               <span className="text-[var(--color-brand-purple)] font-bold tracking-widest uppercase text-sm block mb-2">
                 Selección Exclusiva
               </span>
-              <h2 className="text-4xl font-black text-white tracking-tight">MÁS VENDIDOS</h2>
+              <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight break-words">MÁS VENDIDOS</h2>
             </div>
             <Link href="/catalog" className="text-gray-400 hover:text-[var(--color-brand-gold)] flex items-center transition-colors pb-2">
               Ver todos <ArrowRight className="ml-1 h-4 w-4" />
@@ -203,7 +203,7 @@ export default function Home() {
           viewport={{ once: true }}
           className="max-w-4xl mx-auto px-4 text-center relative z-10"
         >
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-6">ÚNETE A LA FAMILIA FV</h2>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-6 break-words">ÚNETE A LA FAMILIA FV</h2>
           <p className="text-gray-300 text-lg mb-8">
             Recibe acceso anticipado a nuevas colecciones y descuentos exclusivos.
           </p>
