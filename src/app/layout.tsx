@@ -31,7 +31,7 @@ export default function RootLayout({
       lang="es"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased scroll-smooth`}
     >
-      <body className="min-h-full flex flex-col bg-[var(--color-brand-black)] text-white">
+      <body className="min-h-full flex flex-col bg-[var(--color-brand-black)] text-white overflow-x-hidden">
         <CartProvider>
           <Navbar />
           <CartDrawer />

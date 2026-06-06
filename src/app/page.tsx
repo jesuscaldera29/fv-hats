@@ -77,7 +77,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.8 }}
-            className="text-5xl md:text-7xl font-black text-white mb-6 tracking-tighter leading-tight"
+            className="text-4xl sm:text-5xl md:text-7xl font-black text-white mb-6 tracking-tighter leading-tight"
           >
             ELEVA TU ESTILO <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-brand-gold)] to-[var(--color-brand-purple)]">
@@ -98,10 +98,10 @@ export default function Home() {
             transition={{ delay: 0.8, duration: 0.8 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <Link href="/catalog" className="bg-[var(--color-brand-gold)] text-black px-8 py-4 rounded-full font-bold uppercase tracking-wide hover:bg-yellow-400 transition-all flex items-center justify-center transform hover:scale-105">
+            <Link href="/catalog" className="w-full sm:w-auto bg-[var(--color-brand-gold)] text-black px-8 py-4 rounded-full font-bold uppercase tracking-wide hover:bg-yellow-400 transition-all flex items-center justify-center transform hover:scale-105">
               Ver Catálogo <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
-            <Link href="#destacados" className="border border-white/20 text-white px-8 py-4 rounded-full font-bold uppercase tracking-wide hover:bg-white/10 transition-all flex items-center justify-center">
+            <Link href="#destacados" className="w-full sm:w-auto border border-white/20 text-white px-8 py-4 rounded-full font-bold uppercase tracking-wide hover:bg-white/10 transition-all flex items-center justify-center">
               Más Vendidos
             </Link>
           </motion.div>
