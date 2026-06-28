@@ -1,12 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Package, Settings, Home, LogOut, LayoutDashboard, Menu, X, MessageSquareQuote } from 'lucide-react';
 import { useState } from 'react';
+import { createBrowserClient } from '@supabase/ssr';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const menuItems = [
@@ -15,6 +17,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: 'Testimonios', href: '/admin/testimonials', icon: MessageSquareQuote },
     { name: 'Configuración', href: '/admin/settings', icon: Settings },
   ];
+
+  const handleLogout = async () => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    await supabase.auth.signOut();
+    router.push('/admin/login');
+    router.refresh();
+  };
 
   return (
     <div className="flex flex-col md:flex-row min-h-[calc(100vh-80px)] bg-[#0a0a0a]">
@@ -71,7 +83,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Home className="w-5 h-5" />
             <span className="font-medium">Volver a Tienda</span>
           </Link>
-          <button className="w-full flex items-center space-x-3 px-4 py-3 text-red-400 hover:text-red-300 hover:bg-white/5 rounded-lg transition-colors">
+          <button 
+            onClick={handleLogout}
+            className="w-full flex items-center space-x-3 px-4 py-3 text-red-400 hover:text-red-300 hover:bg-white/5 rounded-lg transition-colors"
+          >
             <LogOut className="w-5 h-5" />
             <span className="font-medium">Cerrar Sesión</span>
           </button>
