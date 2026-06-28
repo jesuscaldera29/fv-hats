@@ -3,80 +3,85 @@
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, ShoppingCart, Truck, Shield, Star } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Truck, Shield, Star, Loader2 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getProduct, getProductImages } from '@/app/admin/actions';
 
-// Using mock data for now with rich HTML descriptions
-const mockProducts = [
-  {
-    id: 1,
-    name: "Classic Black Snapback",
-    price: 29.99,
-    description: "La gorra clásica que no puede faltar en tu colección. Diseño minimalista con logo bordado en 3D.",
-    htmlDescription: `
-      <h2>Diseño Atemporal</h2>
-      <p>La <strong>Classic Black Snapback</strong> es el pilar de cualquier estilo urbano. Diseñada para aquellos que aprecian el minimalismo sin comprometer la calidad.</p>
-      
-      <h3>Detalles Premium</h3>
-      <ul>
-        <li>Logotipo frontal bordado en relieve 3D de alta definición.</li>
-        <li>Banda absorbente interior de algodón para máximo confort.</li>
-        <li>Ajuste clásico tipo Snapback para todas las medidas.</li>
-      </ul>
+type Product = {
+  id: number;
+  name: string;
+  price: number;
+  description: string;
+  rich_description: string | null;
+  image: string;
+  category: string;
+};
 
-      <img src="https://images.unsplash.com/photo-1556306535-0f09a536f01f?auto=format&fit=crop&q=80&w=800" alt="Detalle lateral de gorra" />
-      
-      <h3>Materiales</h3>
-      <p>Fabricada con una mezcla de 80% algodón orgánico y 20% poliéster reciclado, garantizando resistencia al desgaste y pérdida de color con el tiempo.</p>
-    `,
-    image: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&q=80&w=600",
-    category: "Snapback"
-  },
-  {
-    id: 2,
-    name: "Urban Gold Edition",
-    price: 34.99,
-    description: "Edición limitada con detalles dorados reflectantes. Perfecta para destacar en la ciudad.",
-    htmlDescription: `
-      <h2>Exclusividad Urbana</h2>
-      <p>Nuestra <strong>Urban Gold Edition</strong> es una pieza de colección limitada. Hemos diseñado esta gorra combinando la oscuridad de la noche urbana con destellos dorados inconfundibles.</p>
-      
-      <h3>¿Por qué elegir esta edición?</h3>
-      <ul>
-        <li>Detalles en hilo de oro de 18k sintético en el logo frontal.</li>
-        <li>Visera inferior verde clásica para protección solar superior.</li>
-        <li>Edición de unidades limitadas, nunca se volverá a producir.</li>
-      </ul>
-
-      <video autoplay loop muted playsinline>
-        <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-        Tu navegador no soporta videos.
-      </video>
-      
-      <p>Lleva tu estilo a otro nivel y haz que las miradas se centren en ti con esta pieza exclusiva de FV Hats.</p>
-    `,
-    image: "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?auto=format&fit=crop&q=80&w=600",
-    category: "Premium"
-  },
-];
+type ProductImage = {
+  id: number;
+  image_url: string;
+};
 
 export default function ProductDetail() {
   const { id } = useParams();
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [galleryImages, setGalleryImages] = useState<ProductImage[]>([]);
+  const [selectedImage, setSelectedImage] = useState<string>('');
+  const [loading, setLoading] = useState(true);
 
-  // Fallback to first product if ID not found in mock data
-  const product = mockProducts.find(p => p.id === Number(id)) || mockProducts[0];
+  useEffect(() => {
+    async function load() {
+      if (!id) return;
+      const productId = Number(id);
+      const [productData, imagesData] = await Promise.all([
+        getProduct(productId),
+        getProductImages(productId),
+      ]);
+
+      if (productData) {
+        setProduct(productData);
+        setSelectedImage(productData.image);
+      }
+      setGalleryImages(imagesData);
+      setLoading(false);
+    }
+    load();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="bg-[var(--color-brand-black)] min-h-screen flex items-center justify-center">
+        <Loader2 className="w-10 h-10 text-[var(--color-brand-gold)] animate-spin" />
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="bg-[var(--color-brand-black)] min-h-screen pt-20 text-center">
+        <h1 className="text-2xl font-bold text-white">Producto no encontrado</h1>
+        <Link href="/catalog" className="text-[var(--color-brand-gold)] mt-4 inline-block hover:underline">
+          Volver al catálogo
+        </Link>
+      </div>
+    );
+  }
+
+  const allImages = [
+    { id: 0, image_url: product.image },
+    ...galleryImages,
+  ];
 
   const handleAddToCart = () => {
-    // Add multiple times based on quantity
     for (let i = 0; i < quantity; i++) {
       addToCart({
         id: product.id,
         name: product.name,
-        price: product.price,
-        image: product.image
+        price: Number(product.price),
+        image: product.image,
       });
     }
   };
@@ -93,17 +98,40 @@ export default function ProductDetail() {
           <div className="grid grid-cols-1 lg:grid-cols-2">
             
             {/* Image Gallery */}
-            <div className="relative aspect-square lg:aspect-auto lg:h-[600px] bg-white/5">
-              <Image 
-                src={product.image} 
-                alt={product.name} 
-                fill 
-                className="object-cover"
-                priority
-              />
-              <div className="absolute top-6 left-6 bg-black/60 backdrop-blur-md px-4 py-2 rounded-full text-xs font-bold text-white uppercase tracking-wider">
-                {product.category}
+            <div className="p-4 lg:p-6">
+              {/* Main Image */}
+              <div className="relative aspect-square rounded-2xl overflow-hidden bg-white/5 mb-4">
+                <Image 
+                  src={selectedImage} 
+                  alt={product.name} 
+                  fill 
+                  className="object-cover"
+                  priority
+                  unoptimized
+                />
+                <div className="absolute top-6 left-6 bg-black/60 backdrop-blur-md px-4 py-2 rounded-full text-xs font-bold text-white uppercase tracking-wider">
+                  {product.category}
+                </div>
               </div>
+
+              {/* Thumbnails */}
+              {allImages.length > 1 && (
+                <div className="flex space-x-3 overflow-x-auto pb-2">
+                  {allImages.map((img) => (
+                    <button
+                      key={img.id}
+                      onClick={() => setSelectedImage(img.image_url)}
+                      className={`relative w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-all ${
+                        selectedImage === img.image_url
+                          ? 'border-[var(--color-brand-gold)] opacity-100'
+                          : 'border-transparent opacity-60 hover:opacity-100'
+                      }`}
+                    >
+                      <Image src={img.image_url} alt="Thumbnail" fill className="object-cover" unoptimized />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Product Info */}
@@ -114,7 +142,6 @@ export default function ProductDetail() {
                 <Star className="w-4 h-4 fill-current" />
                 <Star className="w-4 h-4 fill-current" />
                 <Star className="w-4 h-4 fill-current" />
-                <span className="text-gray-400 text-sm ml-2">(45 opiniones)</span>
               </div>
 
               <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight mb-4">
@@ -122,12 +149,14 @@ export default function ProductDetail() {
               </h1>
               
               <div className="text-3xl font-bold text-[var(--color-brand-purple)] mb-6">
-                ${product.price}
+                ${Number(product.price).toFixed(2)}
               </div>
               
-              <p className="text-gray-400 text-lg mb-8 leading-relaxed border-b border-white/10 pb-8">
-                {product.description}
-              </p>
+              {product.description && (
+                <p className="text-gray-400 text-lg mb-8 leading-relaxed border-b border-white/10 pb-8">
+                  {product.description}
+                </p>
+              )}
 
               <div className="space-y-6 mb-8">
                 <div className="flex items-center text-gray-300">
@@ -167,12 +196,14 @@ export default function ProductDetail() {
         </div>
 
         {/* Detailed Description Section (Rich Text) */}
-        <div className="mt-16 bg-[#0a0a0a] rounded-3xl border border-white/5 p-8 lg:p-12">
-          <div 
-            className="rich-text-container max-w-4xl mx-auto"
-            dangerouslySetInnerHTML={{ __html: product.htmlDescription || '' }}
-          />
-        </div>
+        {product.rich_description && (
+          <div className="mt-16 bg-[#0a0a0a] rounded-3xl border border-white/5 p-8 lg:p-12">
+            <div 
+              className="rich-text-container max-w-4xl mx-auto"
+              dangerouslySetInnerHTML={{ __html: product.rich_description }}
+            />
+          </div>
+        )}
 
       </div>
     </div>

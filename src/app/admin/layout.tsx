@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Package, Settings, Home, LogOut, LayoutDashboard, Menu, X } from 'lucide-react';
+import { Package, Settings, Home, LogOut, LayoutDashboard, Menu, X, MessageSquareQuote } from 'lucide-react';
 import { useState } from 'react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -12,6 +12,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const menuItems = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { name: 'Productos', href: '/admin/products', icon: Package },
+    { name: 'Testimonios', href: '/admin/testimonials', icon: MessageSquareQuote },
     { name: 'Configuración', href: '/admin/settings', icon: Settings },
   ];
 

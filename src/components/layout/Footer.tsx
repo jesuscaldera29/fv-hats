@@ -1,7 +1,34 @@
+'use client';
+
 import Link from 'next/link';
+import Image from 'next/image';
 import { Phone, MapPin } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { getSettings, getSiteContent } from '@/app/admin/actions';
 
 export default function Footer() {
+  const [settings, setSettings] = useState<{
+    logo_url?: string;
+    contact_phone?: string;
+    contact_email?: string;
+  } | null>(null);
+  const [content, setContent] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    async function load() {
+      const [settingsData, contentData] = await Promise.all([
+        getSettings(),
+        getSiteContent(),
+      ]);
+      setSettings(settingsData);
+      setContent(contentData);
+    }
+    load();
+  }, []);
+
+  const footerDescription = content.footer_description || 'Elevando tu estilo con la mejor selección de gorras premium. Diseño, calidad y actitud en cada pieza.';
+  const phone = settings?.contact_phone || '+52 1 234 567 8900';
+
   return (
     <footer id="contacto" className="bg-[#0a0a0a] border-t border-white/10 pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -9,11 +36,24 @@ export default function Footer() {
           
           {/* Brand Info */}
           <div className="space-y-4">
-            <Link href="/" className="text-3xl font-black tracking-tighter text-white block">
-              FV<span className="text-[var(--color-brand-gold)]">HATS</span>
+            <Link href="/" className="block">
+              {settings?.logo_url ? (
+                <Image
+                  src={settings.logo_url}
+                  alt="Logo"
+                  width={140}
+                  height={47}
+                  className="h-12 w-auto object-contain"
+                  unoptimized
+                />
+              ) : (
+                <span className="text-3xl font-black tracking-tighter text-white">
+                  FV<span className="text-[var(--color-brand-gold)]">HATS</span>
+                </span>
+              )}
             </Link>
             <p className="text-gray-400 max-w-xs text-sm leading-relaxed">
-              Elevando tu estilo con la mejor selección de gorras premium. Diseño, calidad y actitud en cada pieza.
+              {footerDescription}
             </p>
           </div>
 
@@ -27,9 +67,6 @@ export default function Footer() {
               <li>
                 <Link href="/catalog" className="hover:text-[var(--color-brand-gold)] transition-colors">Catálogo</Link>
               </li>
-              <li>
-                <Link href="/faq" className="hover:text-[var(--color-brand-gold)] transition-colors">Preguntas Frecuentes</Link>
-              </li>
             </ul>
           </div>
 
@@ -39,7 +76,7 @@ export default function Footer() {
             <ul className="space-y-3 text-sm text-gray-400">
               <li className="flex items-center space-x-3">
                 <Phone className="h-4 w-4 text-[var(--color-brand-purple)]" />
-                <span>+52 1 234 567 8900</span>
+                <span>{phone}</span>
               </li>
               <li className="flex items-center space-x-3">
                 <MapPin className="h-4 w-4 text-[var(--color-brand-purple)]" />

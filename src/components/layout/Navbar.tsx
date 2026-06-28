@@ -1,15 +1,28 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { ShoppingCart, Menu, X, User } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
+import { getSettings } from '@/app/admin/actions';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
   const { setIsCartOpen, totalItems } = useCart();
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadLogo() {
+      const settings = await getSettings();
+      if (settings?.logo_url) {
+        setLogoUrl(settings.logo_url);
+      }
+    }
+    loadLogo();
+  }, []);
 
   const navLinks = [
     { name: 'Inicio', href: '/' },
@@ -24,8 +37,21 @@ export default function Navbar() {
           
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center">
-            <Link href="/" className="text-2xl font-black tracking-tighter text-white">
-              FV<span className="text-[var(--color-brand-gold)]">HATS</span>
+            <Link href="/" className="flex items-center">
+              {logoUrl ? (
+                <Image
+                  src={logoUrl}
+                  alt="Logo"
+                  width={120}
+                  height={40}
+                  className="h-10 w-auto object-contain"
+                  unoptimized
+                />
+              ) : (
+                <span className="text-2xl font-black tracking-tighter text-white">
+                  FV<span className="text-[var(--color-brand-gold)]">HATS</span>
+                </span>
+              )}
             </Link>
           </div>
 
